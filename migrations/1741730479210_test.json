@@ -1,0 +1,18 @@
+{
+  "id": "1741730479210_test",
+  "name": "test",
+  "timestamp": 1741730479210,
+  "up": [
+    "CREATE TABLE users (\nid UUID PRIMARY KEY DEFAULT gen_random_uuid(),\nemail VARCHAR(255) NOT NULL,\nname VARCHAR(255) NOT NULL,\nsettings JSONB NOT NULL DEFAULT '\"{}\"'::jsonb,\ncreated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\nupdated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\nCREATE UNIQUE INDEX users_email_unique ON users(email);",
+    "CREATE TABLE posts (\nid UUID PRIMARY KEY DEFAULT gen_random_uuid(),\ntitle VARCHAR(255) NOT NULL,\ncontent VARCHAR(255) NOT NULL,\npublished BOOLEAN NOT NULL DEFAULT FALSE,\nuser_id UUID NOT NULL,\ncreated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\nupdated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\nALTER TABLE posts ADD CONSTRAINT fk_posts_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;",
+    "CREATE TABLE comments (\nid UUID PRIMARY KEY DEFAULT gen_random_uuid(),\ncontent VARCHAR(255) NOT NULL,\nuser_id UUID NOT NULL,\npost_id UUID NOT NULL,\ncreated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\nupdated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\nALTER TABLE comments ADD CONSTRAINT fk_comments_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;\nALTER TABLE comments ADD CONSTRAINT fk_comments_post_id FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE;"
+  ],
+  "down": [
+    "ALTER TABLE comments DROP CONSTRAINT IF EXISTS fk_comments_post_id;",
+    "ALTER TABLE comments DROP CONSTRAINT IF EXISTS fk_comments_user_id;",
+    "ALTER TABLE posts DROP CONSTRAINT IF EXISTS fk_posts_user_id;",
+    "DROP TABLE IF EXISTS comments;",
+    "DROP TABLE IF EXISTS posts;",
+    "DROP TABLE IF EXISTS users;"
+  ]
+}
