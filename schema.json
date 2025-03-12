@@ -85,6 +85,36 @@
         }
       },
       "timestamps": true
+    },
+    {
+      "name": "categories",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "primary": true
+        },
+        "name": {
+          "type": "string",
+          "unique": true,
+          "nullable": false
+        }
+      },
+      "timestamps": true
+    },
+    {
+      "name": "tags",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "primary": true
+        },
+        "label": {
+          "type": "string",
+          "unique": true,
+          "nullable": false
+        }
+      },
+      "timestamps": true
     }
   ]
-} 
+}

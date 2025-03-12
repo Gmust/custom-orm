@@ -134,4 +134,33 @@ program
     }
   });
 
+program
+  .command('clear')
+  .description('Forcefully clear the database by dropping all tables')
+  .action(async () => {
+    try {
+      // Load the schema to get all table names
+      await schemaManager.loadSchema();
+      const tables = schemaManager.getAllTables();
+
+      // Generate DROP TABLE statements
+      const dropQueries = tables.map(
+        (table) => `DROP TABLE IF EXISTS ${table.name} CASCADE;`,
+      );
+
+      // Execute each DROP TABLE statement
+      await connection.transaction(async (client) => {
+        for (const query of dropQueries) {
+          console.log(`Executing: ${query}`);
+          await client.query(query);
+        }
+      });
+
+      console.log('Database cleared successfully');
+      process.exit(0);
+    } catch (error) {
+      console.error('Failed to clear the database:', error);
+      process.exit(1);
+    }
+  });
 program.parse(process.argv);

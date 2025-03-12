@@ -21,7 +21,9 @@
     "migrate:init": "ts-node src/orm/cli/migration.cli.ts init",
     "migrate:create": "ts-node src/orm/cli/migration.cli.ts create",
     "migrate:up": "ts-node src/orm/cli/migration.cli.ts up",
-    "migrate:down": "ts-node src/orm/cli/migration.cli.ts down"
+    "migrate:down": "ts-node src/orm/cli/migration.cli.ts down",
+    "migrate:clear": "ts-node src/orm/cli/migration.cli.ts clear",
+    "generate:schema": "ts-node src/orm/schema/schema.example.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
