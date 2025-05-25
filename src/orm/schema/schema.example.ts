@@ -16,12 +16,12 @@ const schema: { tables: TableSchema[] } = {
     {
       name: 'posts',
       columns: {
-        id: { type: 'uuid', primary: true },
+        id: { type: 'number', primary: true },
         title: { type: 'string', nullable: false },
         content: { type: 'string', nullable: false },
         published: { type: 'boolean', default: false },
         user_id: {
-          type: 'uuid',
+          type: 'number',
           nullable: false,
           references: { table: 'users', column: 'id', onDelete: 'CASCADE' },
         },
@@ -31,15 +31,15 @@ const schema: { tables: TableSchema[] } = {
     {
       name: 'comments',
       columns: {
-        id: { type: 'uuid', primary: true },
+        id: { type: 'number', primary: true },
         content: { type: 'string', nullable: false },
         user_id: {
-          type: 'uuid',
+          type: 'number',
           nullable: false,
           references: { table: 'users', column: 'id', onDelete: 'CASCADE' },
         },
         post_id: {
-          type: 'uuid',
+          type: 'number',
           nullable: false,
           references: { table: 'posts', column: 'id', onDelete: 'CASCADE' },
         },
@@ -50,7 +50,7 @@ const schema: { tables: TableSchema[] } = {
     {
       name: 'categories',
       columns: {
-        id: { type: 'uuid', primary: true },
+        id: { type: 'number', primary: true },
         name: { type: 'string', unique: true, nullable: false },
       },
       timestamps: true,
@@ -58,7 +58,7 @@ const schema: { tables: TableSchema[] } = {
     {
       name: 'tags',
       columns: {
-        id: { type: 'uuid', primary: true },
+        id: { type: 'number', primary: true },
         label: { type: 'string', unique: true, nullable: false },
       },
       timestamps: true,

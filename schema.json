@@ -27,7 +27,7 @@
       "name": "posts",
       "columns": {
         "id": {
-          "type": "uuid",
+          "type": "number",
           "primary": true
         },
         "title": {
@@ -43,7 +43,7 @@
           "default": false
         },
         "user_id": {
-          "type": "uuid",
+          "type": "number",
           "nullable": false,
           "references": {
             "table": "users",
@@ -58,7 +58,7 @@
       "name": "comments",
       "columns": {
         "id": {
-          "type": "uuid",
+          "type": "number",
           "primary": true
         },
         "content": {
@@ -66,7 +66,7 @@
           "nullable": false
         },
         "user_id": {
-          "type": "uuid",
+          "type": "number",
           "nullable": false,
           "references": {
             "table": "users",
@@ -75,7 +75,7 @@
           }
         },
         "post_id": {
-          "type": "uuid",
+          "type": "number",
           "nullable": false,
           "references": {
             "table": "posts",
@@ -90,7 +90,7 @@
       "name": "categories",
       "columns": {
         "id": {
-          "type": "uuid",
+          "type": "number",
           "primary": true
         },
         "name": {
@@ -105,7 +105,7 @@
       "name": "tags",
       "columns": {
         "id": {
-          "type": "uuid",
+          "type": "number",
           "primary": true
         },
         "label": {
