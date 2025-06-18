@@ -20,6 +20,7 @@ export class QueryBuilder {
   private limitValue?: number;
   private offsetValue?: number;
   private orderByClause: string = '';
+  private insertData?: Record<string, any>;
 
   constructor(options: QueryBuilderOptions) {
     this.table = options.table;
@@ -54,6 +55,20 @@ export class QueryBuilder {
   offset(offset: number): this {
     this.offsetValue = offset;
     return this;
+  }
+
+  insert(data: Record<string, any>): this {
+    this.insertData = data;
+    return this;
+  }
+
+  buildInsert(): { sql: string; params: any[] } {
+    if (!this.insertData) throw new Error('No insert data set.');
+    const columns = Object.keys(this.insertData);
+    const values = Object.values(this.insertData);
+    const placeholders = columns.map((_, i) => `$${i + 1}`);
+    const sql = `INSERT INTO ${this.table} (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) RETURNING *`;
+    return { sql, params: values };
   }
 
   build(): { sql: string; params: any[] } {

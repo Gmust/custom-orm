@@ -105,24 +105,26 @@ export class MigrationGenerator {
     columnName: string,
     column: ColumnDefinition,
   ): string {
-    let sql = `${columnName} ${this.getPostgresType(column.type)}`;
+    let sql = `${columnName}`;
 
     if (column.primary) {
       if (column.type === 'number') {
-        sql += ' INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY';
+        sql = `${columnName} INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY`;
       } else if (column.type === 'uuid') {
-        sql += ' PRIMARY KEY DEFAULT gen_random_uuid()';
+        sql = `${columnName} UUID PRIMARY KEY DEFAULT gen_random_uuid()`;
       } else {
-        sql += ' PRIMARY KEY';
+        sql = `${columnName} ${this.getPostgresType(column.type)} PRIMARY KEY`;
       }
-    }
+    } else {
+      sql += ` ${this.getPostgresType(column.type)}`;
 
-    if (!column.nullable && !column.primary) {
-      sql += ' NOT NULL';
-    }
+      if (!column.nullable) {
+        sql += ' NOT NULL';
+      }
 
-    if (column.default !== undefined && !column.primary) {
-      sql += ` DEFAULT ${this.getDefaultValueSQL(column.default, column.type)}`;
+      if (column.default !== undefined) {
+        sql += ` DEFAULT ${this.getDefaultValueSQL(column.default, column.type)}`;
+      }
     }
 
     return sql;

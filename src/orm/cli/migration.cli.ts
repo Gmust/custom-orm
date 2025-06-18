@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
+import { config } from 'dotenv';
 import { ConnectionManager } from '../connection/connection.manager';
 import { SchemaManager } from '../schema/schema.manager';
 import { MigrationGenerator } from '../migration/migration.generator';
-import { config } from 'dotenv';
+import { buildMigration } from '../migration/migration.builder';
 
 config();
 
@@ -18,7 +19,7 @@ program
 
 program
   .command('init')
-  .description('Initialize the database and migrations')
+  .description('Initialize the database and migrations table')
   .action(async () => {
     try {
       const initQuery = await migrationGenerator.initialize();
@@ -33,23 +34,15 @@ program
 
 program
   .command('create <name>')
-  .description('Create a new migration')
+  .description('Create a new migration based on schema definitions')
   .action(async (name: string) => {
     try {
       await schemaManager.loadSchema();
       const tables = schemaManager.getAllTables();
 
-      const upQueries: string[] = [];
-      const downQueries: string[] = [];
+      const { up, down } = buildMigration(name, tables, migrationGenerator);
+      await migrationGenerator.createMigration(name, up, down);
 
-      for (const table of tables) {
-        const { up, down } = migrationGenerator.generateCreateTableSQL(table);
-        console.log('Generated SQL:', up[0]);
-        upQueries.push(...up);
-        downQueries.push(...down);
-      }
-
-      await migrationGenerator.createMigration(name, upQueries, downQueries);
       console.log(`Migration ${name} created successfully`);
       process.exit(0);
     } catch (error) {
@@ -84,7 +77,8 @@ program
           console.log(`Migration ${migration.name} completed`);
         }
       }
-      console.log('All migrations completed successfully');
+
+      console.log('All pending migrations executed successfully');
       process.exit(0);
     } catch (error) {
       console.error('Failed to run migrations:', error);
@@ -94,7 +88,7 @@ program
 
 program
   .command('down')
-  .description('Rollback the last migration')
+  .description('Rollback the last executed migration')
   .action(async () => {
     try {
       const lastMigration = await connection.query<{
@@ -139,16 +133,13 @@ program
   .description('Forcefully clear the database by dropping all tables')
   .action(async () => {
     try {
-      // Load the schema to get all table names
       await schemaManager.loadSchema();
       const tables = schemaManager.getAllTables();
 
-      // Generate DROP TABLE statements
-      const dropQueries = tables.map(
-        (table) => `DROP TABLE IF EXISTS ${table.name} CASCADE;`,
-      );
+      const dropQueries = [...tables]
+        .reverse()
+        .map((table) => `DROP TABLE IF EXISTS ${table.name} CASCADE;`);
 
-      // Execute each DROP TABLE statement
       await connection.transaction(async (client) => {
         for (const query of dropQueries) {
           console.log(`Executing: ${query}`);
@@ -163,4 +154,5 @@ program
       process.exit(1);
     }
   });
+
 program.parse(process.argv);

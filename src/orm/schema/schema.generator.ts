@@ -49,24 +49,26 @@ class SchemaGenerator {
     columnName: string,
     column: ColumnDefinition,
   ): string {
-    let sql = `${columnName} ${this.getPostgresType(column.type)}`;
+    let sql = `${columnName}`;
 
     if (column.primary) {
-      if (column.type === 'uuid') {
-        sql += ' PRIMARY KEY DEFAULT gen_random_uuid()';
-      } else if (column.type === 'number') {
-        sql = `${columnName} SERIAL PRIMARY KEY`;
+      if (column.type === 'number') {
+        sql += ' INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY';
+      } else if (column.type === 'uuid') {
+        sql += ' UUID PRIMARY KEY DEFAULT gen_random_uuid()';
       } else {
-        sql += ' PRIMARY KEY';
+        sql += ` ${this.getPostgresType(column.type)} PRIMARY KEY`;
       }
-    }
+    } else {
+      sql += ` ${this.getPostgresType(column.type)}`;
 
-    if (!column.nullable && !column.primary) {
-      sql += ' NOT NULL';
-    }
+      if (!column.nullable) {
+        sql += ' NOT NULL';
+      }
 
-    if (column.default !== undefined && !column.primary) {
-      sql += ` DEFAULT ${this.getDefaultValueSQL(column.default, column.type)}`;
+      if (column.default !== undefined) {
+        sql += ` DEFAULT ${this.getDefaultValueSQL(column.default, column.type)}`;
+      }
     }
 
     return sql;
